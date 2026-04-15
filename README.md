@@ -1,6 +1,6 @@
 # 🎫 Ticket Management System API
 
-A production-ready REST API built with **FastAPI** featuring JWT authentication, role-based access control, and a custom **RAG-based AI assistant** — built without LangChain.
+A production-ready REST API built with **FastAPI** featuring JWT authentication, role-based access control, and a custom **RAG-based AI assistant**.
 
 ---
 
@@ -69,29 +69,14 @@ ticket_system/
 ## 🚀 Quick Start
 
 ### 1. Clone & Setup
-
-```bash
-git clone <repo-url>
-cd ticket_system
-
-# Create virtual environment
+git clone https://github.com/raunak2910/ticket-management-system.git
+cd ticket-management-system/ticket_system
+**2. Create Virtual Environment**
 python -m venv venv
-source venv/bin/activate        # Linux/macOS
-# OR
-venv\Scripts\activate           # Windows
-
-# Install dependencies
+**3.Install Dependencies**
 pip install -r requirements.txt
-```
 
-### 2. Configure Environment
-
-```bash
-cp .env.example .env
-# Edit .env if needed (defaults work out of the box with SQLite)
-```
-
-### 3. Seed Sample Data (Optional)
+### 4. Seed Sample Data (Optional)
 
 ```bash
 python seed.py
@@ -103,7 +88,7 @@ This creates:
 - **Bob**: `bob@example.com` / `bob123`
 - **Carol**: `carol@example.com` / `carol123`
 
-### 4. Run the Server
+### 5. Run the Server
 
 ```bash
 uvicorn app.main:app --reload
@@ -113,18 +98,6 @@ The API is now running at **http://localhost:8000**
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
-
----
-
-## 🐳 Docker
-
-```bash
-# Build and run
-docker build -t ticket-api .
-docker run -p 8000:8000 -e SECRET_KEY=your-secret-key ticket-api
-
-# With docker-compose (create docker-compose.yml as needed)
-```
 
 ---
 
