@@ -1,0 +1,278 @@
+{
+  "info": {
+    "name": "Ticket Management System API",
+    "description": "Complete API collection for the Ticket Management System.\n\nSetup:\n1. Set `base_url` variable to `http://localhost:8000`\n2. Register and login to get a token\n3. The collection auto-sets the `token` variable after login",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "token", "value": "" },
+    { "key": "ticket_id", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securepass123\",\n  \"role\": \"user\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\",\n  \"role\": \"admin\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "  pm.collectionVariables.set('token', json.access_token);",
+                  "  console.log('Token saved:', json.access_token.substring(0,20) + '...');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securepass123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "Create Ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.id) { pm.collectionVariables.set('ticket_id', json.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/tickets/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Login page broken\",\n  \"description\": \"Users cannot login after last deployment.\",\n  \"priority\": \"high\",\n  \"category\": \"bug\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Tickets",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/tickets/?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["tickets", ""],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "status", "value": "open", "disabled": true },
+                { "key": "priority", "value": "high", "disabled": true },
+                { "key": "category", "value": "bug", "disabled": true },
+                { "key": "search", "value": "login", "disabled": true },
+                { "key": "sort_by", "value": "created_at", "disabled": true },
+                { "key": "sort_order", "value": "desc", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Ticket by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/tickets/{{ticket_id}}"
+          }
+        },
+        {
+          "name": "Update Ticket",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/tickets/{{ticket_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated: Login page broken\",\n  \"priority\": \"medium\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Ticket Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/tickets/{{ticket_id}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Ticket",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/tickets/{{ticket_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Admin - List All Tickets",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/admin/tickets?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "tickets"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "created_by", "value": "1", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/admin/stats"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Assistant",
+      "item": [
+        {
+          "name": "AI Query - Ticket Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/ai/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What is the status of ticket 1?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "AI Query - High Priority Open",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/ai/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Show all high priority open tickets\"\n}"
+            }
+          }
+        },
+        {
+          "name": "AI Query - Summarize Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/ai/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Summarize ticket 2\"\n}"
+            }
+          }
+        },
+        {
+          "name": "AI Query - User Tickets",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/ai/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Which tickets were created by user Alice?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "AI Query - Stats",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{base_url}}/ai/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"How many tickets are open?\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
